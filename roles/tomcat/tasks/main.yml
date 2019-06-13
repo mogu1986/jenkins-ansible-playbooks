@@ -1,14 +1,11 @@
 ---
-# author: Jim
+# author: wei.gao
 
 - name: debug | 打印 变量
   debug: msg="app = {{ app }}, lang = {{ lang }}, war_path = {{ war_path }}"
 
 - name: backup | 创建存储备份的文件夹
   file: path={{ tomcat_path }}backup state=directory
-  environment:
-    LANG: "zh_CN.GBK"
-    LC_ALL: "zh_CN.GBK"
 
 - name: backup | cp war
   shell: cp -r {{ tomcat_path }}webapps/{{ app }}.war  {{ tomcat_path }}backup/{{ app }}-`date '+%F'`.war
