@@ -28,7 +28,7 @@
   shell: kill -9 {{ var_pid.stdout }}
   when: var_pid.stdout != ''
 
-- name: stop | 清理垃圾
+- name: stop | 清理旧文件
   shell: "rm -rf {{ tomcat_path }}{{ item }}/*"
   with_items:
     - webapps
