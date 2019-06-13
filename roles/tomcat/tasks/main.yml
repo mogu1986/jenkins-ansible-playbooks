@@ -8,7 +8,7 @@
   file: path={{ tomcat_path }}backup state=directory
 
 - name: backup | cp war
-  shell: cp -r {{ tomcat_path }}webapps/demo.war  {{ tomcat_path }}backup/demo-`date '+%F'`.war
+  shell: cp -r {{ tomcat_path }}webapps/{{ app }}.war  {{ tomcat_path }}backup/{{ app }}-`date '+%F'`.war
   ignore_errors: true
 
 - name: stop | 停止tomcat
