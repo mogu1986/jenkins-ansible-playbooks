@@ -1,0 +1,12 @@
+---
+# author: wei.gao
+
+- import_tasks: tomcat.yml
+  when:
+    - lang is defined
+    - lang == 'tomcat'
+
+- import_tasks: nginx.yml
+  when:
+    - lang is defined
+    - lang == 'nginx'
