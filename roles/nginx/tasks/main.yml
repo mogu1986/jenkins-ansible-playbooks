@@ -1,0 +1,5 @@
+---
+# author: wei.gao
+
+- name: debug | 打印 变量
+  debug: msg="app = {{ app }}, lang = {{ lang }}"
