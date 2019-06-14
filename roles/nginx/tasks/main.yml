@@ -3,3 +3,10 @@
 
 - name: debug | 打印 变量
   debug: msg="app = {{ app }}, lang = {{ lang }}"
+
+
+- name: stop | 停止tomcat
+  shell: "{{ nginx_path }}nginx -s stop"
+
+- name: stop | 等待端口关闭
+  wait_for: port={{ nginx_port }} state=stopped delay=3
