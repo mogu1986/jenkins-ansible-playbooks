@@ -1,7 +1,7 @@
 ---
 # author: wei.gao
 
-- name: debug | 打印 变量
+- name: debug |  打印 变量
   debug: msg="app = {{ app }}, lang = {{ lang }}, war_path = {{ war_path }}"
 
 - name: backup | 创建存储备份的文件夹
@@ -11,7 +11,7 @@
   shell: cp -r {{ tomcat_path }}webapps/{{ app }}.war  {{ tomcat_path }}backup/{{ app }}-`date '+%F'`.war
   ignore_errors: true
 
-- name: stop | 停止tomcat
+- name: stop |  停止tomcat
   shell: "{{ tomcat_path }}bin/catalina.sh stop -force"
 
 - name: check | 检查 catalina.sh 是否关闭成功
@@ -21,14 +21,14 @@
 - name: debug | 打印 pid
   debug: msg="{{ var_pid }}"
 
-- name: stop | 强制 停止tomcat
+- name: stop |  强制 停止tomcat
   shell: kill -9 {{ var_pid.stdout }}
   when: var_pid.stdout != ''
 
-- name: stop | 等待端口关闭
+- name: stop |  等待端口关闭
   wait_for: port={{ tomcat_port }} state=stopped delay=3
 
-- name: stop | 清理旧文件
+- name: stop |  清理旧文件
   shell: "rm -rf {{ tomcat_path }}{{ item }}/*"
   with_items:
     - webapps
