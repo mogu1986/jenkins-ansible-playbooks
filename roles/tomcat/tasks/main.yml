@@ -14,9 +14,6 @@
 - name: stop | 停止tomcat
   shell: "{{ tomcat_path }}bin/catalina.sh stop -force"
 
-- name: stop | 等待端口关闭
-  wait_for: port={{ tomcat_port }} state=stopped delay=3
-
 - name: check | 检查 catalina.sh 是否关闭成功
   shell: ps -ef | grep tomcat | grep {{ tomcat_path }} | grep -v grep | awk '{print $2}'
   register: var_pid
@@ -27,6 +24,9 @@
 - name: stop | 强制 停止tomcat
   shell: kill -9 {{ var_pid.stdout }}
   when: var_pid.stdout != ''
+
+- name: stop | 等待端口关闭
+  wait_for: port={{ tomcat_port }} state=stopped delay=3
 
 - name: stop | 清理旧文件
   shell: "rm -rf {{ tomcat_path }}{{ item }}/*"
