@@ -11,19 +11,19 @@
 - name: debug | 打印 pid
   debug: msg="{{ var_pid }}"
 
-- name: stop | 强制 停止tomcat
+- name: stop |  强制 停止openresty
   shell: kill -9 {{ var_pid.stdout }}
   when: var_pid.stdout != ''
 
-- name: stop | 停止 openresty
+- name: stop |  停止 openresty
   shell: "{{ nginx_path }}sbin/nginx -s stop"
   when: var_pid.stdout != ''
   ignore_errors: true
 
-- name: stop | 等待端口关闭
+- name: stop |  等待端口关闭
   wait_for: port={{ nginx_port }} state=stopped delay=3
 
-- name: stop | 清理旧文件
+- name: stop |  清理旧文件
   shell: "rm -rf {{ nginx_path }}{{ item }}/*"
   with_items:
     - html
