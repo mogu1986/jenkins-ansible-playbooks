@@ -16,11 +16,6 @@
   with_items: "{{ var_pid.stdout_lines }}"
   when: var_pid.stdout != ''
 
-- name: stop |  停止 openresty
-  shell: "{{ nginx_path }}sbin/nginx -s stop"
-  when: var_pid.stdout != ''
-  ignore_errors: true
-
 - name: stop |  等待端口关闭
   wait_for: port={{ nginx_port }} state=stopped delay=3
 
