@@ -5,14 +5,15 @@
   debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
 - name: check | 检查 openresty {{ nginx_port }} 是否开启
-  shell: ps -ef | grep nginx | grep {{ nginx_path }} | grep -v grep | awk '{print $2}'
+  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
   register: var_pid
 
 - name: debug | 打印 pid
   debug: msg="{{ var_pid }}"
 
 - name: stop |  强制 停止openresty
-  shell: kill -9 {{ var_pid.stdout }}
+  shell: kill -9 {{ item }}
+  with_items: "{{ var_pid.stdout_lines }}"
   when: var_pid.stdout != ''
 
 - name: stop |  停止 openresty
