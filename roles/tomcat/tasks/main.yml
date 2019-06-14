@@ -37,7 +37,7 @@
     - temp
 
 - name: deploy | 上传war
-  copy: src={{ war_path }} dest={{ tomcat_path }}webapps/{{ app }}.war
+  copy: src={{ war_path }} dest={{ tomcat_path }}webapps/
 
 - name: deploy | 启动服务
   shell: chdir={{ tomcat_path }}bin nohup ./catalina.sh start &
