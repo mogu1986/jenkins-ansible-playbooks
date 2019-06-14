@@ -3,4 +3,5 @@
   become: yes
   gather_facts: True
   roles:
-    - { role: deploy, when: lang is defined}
+    - { role: tomcat, when: lang == 'tomcat'}
+    - { role: nginx, when: lang == 'nginx'}
