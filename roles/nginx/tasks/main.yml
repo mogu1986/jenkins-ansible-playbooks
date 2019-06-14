@@ -33,5 +33,5 @@
   copy: src={{ html_path }} dest={{ nginx_path }}html/
 
 - name: deploy | 启动服务
-  shell: chdir={{ nginx_path }} nohup ./sbin/nginx &
+  shell: nohup {{ nginx_path }}sbin/nginx &
   ignore_errors: true
