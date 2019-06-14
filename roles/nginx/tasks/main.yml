@@ -21,7 +21,7 @@
   ignore_errors: true
 
 - name: stop |  等待端口关闭
-  wait_for: port={{ nginx_port }} state=stopped delay=3
+  wait_for: port={{ nginx_port }} state=stopped delay=1 connect_timeout=1 timeout=3
 
 - name: stop |  清理旧文件
   shell: "rm -rf {{ nginx_path }}{{ item }}/*"
