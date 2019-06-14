@@ -4,8 +4,20 @@
 - name: debug | 打印 变量
   debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
+- name: check | 检查 openresty {{ nginx_port }} 是否开启
+  shell: ps -ef | grep nginx | grep {{ nginx_path }} | grep -v grep | awk '{print $2}'
+  register: var_pid
+
+- name: debug | 打印 pid
+  debug: msg="{{ var_pid }}"
+
+- name: stop | 强制 停止tomcat
+  shell: kill -9 {{ var_pid.stdout }}
+  when: var_pid.stdout != ''
+
 - name: stop | 停止 openresty
   shell: "{{ nginx_path }}sbin/nginx -s stop"
+  when: var_pid.stdout != ''
   ignore_errors: true
 
 - name: stop | 等待端口关闭
@@ -16,9 +28,6 @@
   with_items:
     - html
     - logs
-
-#- name: deploy | 上传 dist.tar.gz
-#  unarchive: src=/Users/gaowei/Desktop/workspaces/jenkins-vue/dist.tar.gz dest={{ nginx_path }}html/ copy=yes mode=0755
 
 - name: deploy | 上传 dist
   copy: src={{ html_path }} dest={{ nginx_path }}html/
