@@ -2,7 +2,7 @@
 # author: wei.gao
 
 - name: debug | 打印 变量
-  debug: msg="app = {{ app }}, lang = {{ lang }}, war_path = {{ war_path }}"
+  debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
 - name: stop | 停止 openresty
   shell: "{{ nginx_path }}sbin/nginx -s stop"
@@ -17,11 +17,8 @@
     - html
     - logs
 
-#- name: deploy | 上传 dist.tar.gz
-#  unarchive: src=/Users/gaowei/Desktop/workspaces/jenkins-vue/dist.tar.gz dest={{ nginx_path }}html/ copy=yes mode=0755
-
 - name: deploy | 上传 dist
-  copy: src=/Users/gaowei/Desktop/workspaces/jenkins-vue/dist/ dest={{ nginx_path }}html/
+  copy: src={{ html_path }} dest={{ nginx_path }}html/
 
 - name: deploy | 启动服务
   shell: chdir={{ nginx_path }} nohup ./sbin/nginx &
