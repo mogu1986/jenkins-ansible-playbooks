@@ -2,11 +2,27 @@
 # author: wei.gao
 
 - name: debug | 打印 变量
-  debug: msg="app = {{ app }}, lang = {{ lang }}"
+  debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
-
-- name: stop | 停止tomcat
-  shell: "{{ nginx_path }}nginx -s stop"
+- name: stop | 停止 openresty
+  shell: "{{ nginx_path }}sbin/nginx -s stop"
+  ignore_errors: true
 
 - name: stop | 等待端口关闭
   wait_for: port={{ nginx_port }} state=stopped delay=3
+
+- name: stop | 清理旧文件
+  shell: "rm -rf {{ nginx_path }}{{ item }}/*"
+  with_items:
+    - html
+    - logs
+
+#- name: deploy | 上传 dist.tar.gz
+#  unarchive: src=/Users/gaowei/Desktop/workspaces/jenkins-vue/dist.tar.gz dest={{ nginx_path }}html/ copy=yes mode=0755
+
+- name: deploy | 上传 dist
+  copy: src={{ {{ html_path }} }} dest={{ nginx_path }}html/
+
+- name: deploy | 启动服务
+  shell: chdir={{ nginx_path }} nohup ./sbin/nginx &
+  ignore_errors: true
