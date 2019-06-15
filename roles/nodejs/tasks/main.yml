@@ -8,9 +8,6 @@
   shell: "{{ nginx_path }}sbin/nginx -s stop"
   ignore_errors: true
 
-- name: stop |  wait 2m
-  wait_for: port={{ nginx_port }} state=stopped delay=20
-
 - name: check | 检查 openresty {{ nginx_port }} 是否开启
   shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
   register: var_pid
