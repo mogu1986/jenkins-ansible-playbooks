@@ -4,6 +4,10 @@
 - name: debug | 打印 变量
   debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
+- name: stop | stop nginx -s stop
+  shell: {{ nginx_path }}sbin/nginx -s stop
+  ignore_errors: true
+
 - name: check | 检查 openresty {{ nginx_port }} 是否开启
   shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
   register: var_pid
