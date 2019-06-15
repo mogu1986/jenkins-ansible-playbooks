@@ -16,8 +16,8 @@
   debug: msg="{{ var_pid }}"
 
 - name: stop |  强制 停止openresty
-  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -9
-  ignore_errors: yes
+  shell: kill -9 {{ item }}
+  with_items: "{{ var_pid.stdout_lines }}"
   when: var_pid.stdout != ''
 
 - name: stop |  等待端口关闭
