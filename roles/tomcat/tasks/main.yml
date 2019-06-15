@@ -1,7 +1,7 @@
 ---
 # author: wei.gao
 
-- name: debug |  打印 变量
+- name: "debug |  打印 变量"
   debug: msg="app = {{ app }}, lang = {{ lang }}, war_path = {{ war_path }}"
 
 - name: backup | 创建存储备份的文件夹
