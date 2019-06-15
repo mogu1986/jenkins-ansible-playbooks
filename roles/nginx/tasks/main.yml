@@ -16,8 +16,7 @@
   debug: msg="{{ var_pid }}"
 
 - name: stop |  强制 停止openresty
-  shell: "kill -9 {{ item }}"
-  with_items: "{{ var_pid.stdout_lines }}"
+  shell: ps -ef | grep openresty | grep -v grep | awk '{print $2}' | xargs kill -9
   ignore_errors: yes
   when: var_pid.stdout != ''
 
