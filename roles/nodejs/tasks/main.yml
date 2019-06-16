@@ -7,18 +7,18 @@
 - name: stop | stop nginx -s stop
   shell: "{{ nginx_path }}sbin/nginx -s stop"
   ignore_errors: true
-
-- name: check | 检查 openresty {{ nginx_port }} 是否开启
-  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
-  register: var_pid
-
-- name: debug | 打印 pid
-  debug: msg="{{ var_pid }}"
-
-- name: stop |  强制 停止openresty
-  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -9
-  ignore_errors: yes
-  when: var_pid.stdout != ''
+#
+#- name: check | 检查 openresty {{ nginx_port }} 是否开启
+#  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
+#  register: var_pid
+#
+#- name: debug | 打印 pid
+#  debug: msg="{{ var_pid }}"
+#
+#- name: stop |  强制 停止openresty
+#  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -9
+#  ignore_errors: yes
+#  when: var_pid.stdout != ''
 
 #- name: stop |  强制 停止openresty
 #  shell: kill -9 {{ item }}
