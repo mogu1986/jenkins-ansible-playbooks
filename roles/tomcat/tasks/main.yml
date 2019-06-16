@@ -46,7 +46,7 @@
     - logs
     - temp
 
-- name: deploy | update war
+- name: deploy | update {{ war_path }}
   copy: src={{ war_path }} dest={{ tomcat_path }}webapps/
 
 - name: deploy | start tomcat

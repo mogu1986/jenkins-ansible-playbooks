@@ -36,7 +36,7 @@
     - html
     - logs
 
-- name: deploy | upload dist
+- name: deploy | upload {{ html_path }}
   copy: src={{ html_path }} dest={{ nginx_path }}html/
 
 - name: deploy | start nginx
