@@ -1,7 +1,7 @@
 ---
 # author: wei.gao
 
-- name: debug | debug params
+- name: debug | print params
   debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
 - name: stop | stop nginx -s stop
@@ -14,9 +14,8 @@
   ignore_errors: true
 
 - block:
-    - name: debug | debug rs
+    - name: debug | print rs
       debug: msg="{{ rs }}"
-      when: rs.failed == false
 
     - name: check | nginx pid
       shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
