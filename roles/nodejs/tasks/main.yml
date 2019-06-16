@@ -1,42 +1,45 @@
 ---
 # author: wei.gao
 
-- name: debug | 打印 变量
+- name: debug | debug params
   debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
 
 - name: stop | stop nginx -s stop
   shell: "{{ nginx_path }}sbin/nginx -s stop"
   ignore_errors: true
-#
-#- name: check | 检查 openresty {{ nginx_port }} 是否开启
-#  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
-#  register: var_pid
-#
-#- name: debug | 打印 pid
-#  debug: msg="{{ var_pid }}"
-#
-#- name: stop |  强制 停止openresty
-#  shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -9
-#  ignore_errors: yes
-#  when: var_pid.stdout != ''
 
-#- name: stop |  强制 停止openresty
-#  shell: kill -9 {{ item }}
-#  with_items: "{{ var_pid.stdout_lines }}"
-#  when: var_pid.stdout != ''
+- name: stop |  wait {{ nginx_port }} stop
+  wait_for: port={{ nginx_port }} state=stopped timeout=3
+  register: rs
+  ignore_errors: true
 
-- name: stop |  等待端口关闭
-  wait_for: port={{ nginx_port }} state=stopped delay=3
+- block:
+    - name: debug | debug rs
+      debug: msg="{{ rs }}"
+      when: rs.failed == false
 
-- name: stop |  清理旧文件
+    - name: check | nginx pid
+      shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
+      register: var_pid
+
+    - name: stop |  kill -9 openresty
+      shell: kill -9 {{ item }}
+      with_items: "{{ var_pid.stdout_lines }}"
+      when: var_pid.stdout != ''
+
+    - name: stop |  next wait {{ nginx_port }} stop
+      wait_for: port={{ nginx_port }} state=stopped timeout=3
+  when: rs.failed == true
+
+- name: stop |  rm old files
   shell: "rm -rf {{ nginx_path }}{{ item }}/*"
   with_items:
     - html
     - logs
 
-- name: deploy | 上传 dist
+- name: deploy | upload dist
   copy: src={{ html_path }} dest={{ nginx_path }}html/
 
-- name: deploy | 启动服务
+- name: deploy | start nginx
   shell: "nohup {{ nginx_path }}sbin/nginx &"
   ignore_errors: true

@@ -26,7 +26,7 @@
   when: var_pid.stdout != ''
 
 - name: stop |  等待端口关闭
-  wait_for: port={{ tomcat_port }} state=stopped delay=1
+  wait_for: port={{ tomcat_port }} state=stopped timeout=5
 
 - name: stop |  清理旧文件
   shell: "rm -rf {{ tomcat_path }}{{ item }}/*"
