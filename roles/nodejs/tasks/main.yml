@@ -2,7 +2,7 @@
 # author: wei.gao
 
 - name: debug | print params
-  debug: msg="app = {{ app }}, lang = {{ lang }}, html_path = {{ html_path }}"
+  debug: msg="app = {{ app }}, lang = {{ lang }}, artifact = {{ artifact }}"
 
 - name: stop | stop nginx -s stop
   shell: "{{ nginx_path }}sbin/nginx -s stop"
@@ -36,8 +36,8 @@
     - html
     - logs
 
-- name: deploy | upload {{ html_path }}
-  copy: src={{ html_path }} dest={{ nginx_path }}html/
+- name: deploy | upload {{ artifact }}
+  copy: src={{ artifact }} dest={{ nginx_path }}html/
 
 - name: deploy | start nginx
   shell: "nohup {{ nginx_path }}sbin/nginx &"

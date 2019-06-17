@@ -2,7 +2,7 @@
 # author: wei.gao
 
 - name: debug |  print params
-  debug: msg="app = {{ app }}, lang = {{ lang }}, war_path = {{ war_path }}"
+  debug: msg="app = {{ app }}, lang = {{ lang }}, artifact = {{ artifact }}"
 
 - name: backup | create dir {{ tomcat_path }}backup
   file: path={{ tomcat_path }}backup state=directory
@@ -46,8 +46,8 @@
     - logs
     - temp
 
-- name: deploy | upload {{ war_path }}
-  copy: src={{ war_path }} dest={{ tomcat_path }}webapps/
+- name: deploy | upload {{ artifact }}
+  copy: src={{ artifact }} dest={{ tomcat_path }}webapps/
 
 - name: deploy | start tomcat
   shell: chdir={{ tomcat_path }}bin nohup ./catalina.sh start &
