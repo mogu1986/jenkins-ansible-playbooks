@@ -15,7 +15,7 @@
   shell: "{{ tomcat_path }}bin/catalina.sh stop -force"
 
 - name: stop |  wait {{ tomcat_port }} stop
-  wait_for: port={{ tomcat_port }} state=stopped timeout=3
+  wait_for: port={{ tomcat_port }} state=stopped timeout=5
   register: rs
   ignore_errors: true
 
