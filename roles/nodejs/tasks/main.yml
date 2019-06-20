@@ -39,7 +39,7 @@
 - name: deploy | upload {{ artifact }}
   copy: src={{ artifact }} dest=/tmp/html.tar.gz
 
-- name: deploy | upload {{ artifact }}
+- name: deploy | tar -xvzf
   shell: tar -zxvf /tmp/html.tar.gz -C {{ nginx_path }}html
 
 - name: deploy | start nginx
