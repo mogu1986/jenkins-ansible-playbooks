@@ -37,8 +37,10 @@
     - logs
 
 - name: deploy | upload {{ artifact }}
-#  copy: src={{ artifact }} dest={{ nginx_path }}html/
-  unarchive: src={{ artifact }} dest={{ nginx_path }} copy=yes mode=0755
+  copy: src={{ artifact }} dest=/tmp/html.tar.gz
+
+- name: deploy | upload {{ artifact }}
+  shell: tar -zxvf /tmp/html.tar.gz -C {{ nginx_path }}html
 
 - name: deploy | start nginx
   shell: "nohup {{ nginx_path }}sbin/nginx &"
