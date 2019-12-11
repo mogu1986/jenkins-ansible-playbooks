@@ -3,4 +3,5 @@
   become: yes
   gather_facts: no
   roles:
-    - { role: nodejs, when: lang == 'nodejs'}
+    - { role: nodejs, when: lang == 'nodejs' and run is not defined }
+    - { role: nodejs_docker, when: lang == 'nodejs' and run is defined and run == 'docker' }
