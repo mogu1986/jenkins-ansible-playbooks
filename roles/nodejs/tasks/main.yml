@@ -2,7 +2,19 @@
 # author: wei.gao
 
 - name: debug | print params
-  debug: msg="app = {{ app }}, lang = {{ lang }}, artifact = {{ artifact }}"
+  debug: msg="app = {{ app }}, lang = {{ lang }}, artifact = {{ artifact }}, env = {{ env }}"
+
+- block:
+  - name: backup | mkdir backup dir
+    file: path={{ nginx_path }}backup state=directory
+
+  - name: backup | backup dist
+    shell: cd {{ nginx_path }} && tar -zcvf dist.tar.gz * && mv dist.tar.gz {{ nginx_path }}backup/dist-`date '+%Y%m%d%H%M'`.tar.gz
+    ignore_errors: true
+  when: env == "prod"
+
+- name: upload | upload {{ artifact }}
+  copy: src={{ artifact }} dest=/tmp/html.tar.gz
 
 - name: stop | stop nginx -s stop
   shell: "{{ nginx_path }}sbin/nginx -s stop"
@@ -21,7 +33,7 @@
       shell: ps -ef | grep nginx | grep -v grep | awk '{print $2}'
       register: var_pid
 
-    - name: stop |  kill -9 openresty
+    - name: stop |  kill -9 nginx
       shell: kill -9 {{ item }}
       with_items: "{{ var_pid.stdout_lines }}"
       when: var_pid.stdout != ''
@@ -34,10 +46,6 @@
   shell: "rm -rf {{ nginx_path }}{{ item }}/*"
   with_items:
     - html
-    - logs
-
-- name: deploy | upload {{ artifact }}
-  copy: src={{ artifact }} dest=/tmp/html.tar.gz
 
 - name: deploy | tar -xvzf
   shell: tar -zxvf /tmp/html.tar.gz -C {{ nginx_path }}html
