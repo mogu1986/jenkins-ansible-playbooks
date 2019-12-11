@@ -1,0 +1,18 @@
+---
+# author: wei.gao
+
+- name: debug |  print params
+  debug: msg="this is docker runtime, = {{ app }}, lang = {{ lang }}, env = {{ env }}, artifact = {{ artifact }}"
+
+- name: docker pull {{ artifact }}
+  shell: docker pull {{ artifact }}
+
+- name: docker rm -f {{ app }}
+  shell: docker rm -f {{ app }}
+  ignore_errors: true
+
+- name: debug |  run nginx command
+  debug: msg="docker run -d --restart=always --name {{ app }} {{ portArgs }} {{ artifact }}"
+
+- name: start
+  shell: docker run -d --restart=always --name {{ app }} {{ portArgs }} {{ artifact }}
