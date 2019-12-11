@@ -1,0 +1,6 @@
+- hosts: '{{ app }}'
+  remote_user: root
+  become: yes
+  gather_facts: no
+  roles:
+    - { role: java, when: lang == 'java'}
