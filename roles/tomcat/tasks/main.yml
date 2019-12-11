@@ -1,21 +1,45 @@
 ---
-# author: wei.gao
+# sxh
 
-- name: debug |  print params
-  debug: msg="app = {{ app }}, lang = {{ lang }}, artifact = {{ artifact }}"
+- name: debug | print var
+  debug: msg="app = {{ app }}, lang = {{ lang }}, appPort={{ appPort }}, artifact = {{ artifact }}"
 
-- name: backup | create dir {{ tomcat_path }}backup
-  file: path={{ tomcat_path }}backup state=directory
+# register 无视 when 执行，见： https://stackoverflow.com/questions/34621799/ansible-how-do-i-avoid-registering-a-variable-when-a-when-condition-is-not
+- shell: echo "/data/tomcat/"
+  register: p
+  ignore_errors: True
 
-- name: backup | cp war
-  shell: cp -r {{ tomcat_path }}webapps/{{ app }}.war  {{ tomcat_path }}backup/{{ app }}-`date '+%F'`.war
+- set_fact: tomcat_path="{{ p }}"
+  when: p.changed
+
+#- shell: echo "/data/local/instances/"
+#  register: p
+#  when: app == "img" and env == "prod"
+
+- set_fact: tomcat_path="{{ p }}"
+  when: p.changed
+
+- name: debug | tomcat path
+  debug: msg="tomcat_path = {{ tomcat_path }}"
+
+- block:
+  - name: backup | mkdir backup dir
+    file: path={{ tomcat_path.stdout }}{{app}}/backup state=directory
+
+  - name: backup | cp war  to backup dir
+    shell: cp -r {{ tomcat_path.stdout }}{{ app }}/webapps/ROOT.war  {{ tomcat_path.stdout }}{{ app }}/backup/{{ app }}-`date '+%Y%m%d%H%M'`.war
+    ignore_errors: true
+  when: env == "prod"
+
+- name: deploy | upload war
+  copy: src={{ artifact }} dest=/tmp/{{ app }}.war
+
+- name: stop | stop tomcat
+  shell: "{{ tomcat_path.stdout }}{{ app }}/bin/catalina.sh stop -force"
   ignore_errors: true
 
-- name: stop |  stop tomcat
-  shell: "{{ tomcat_path }}bin/catalina.sh stop -force"
-
-- name: stop |  wait {{ tomcat_port }} stop
-  wait_for: port={{ tomcat_port }} state=stopped timeout=5
+- name: stop | wait port close
+  wait_for: port={{ appPort }} state=stopped timeout=5
   register: rs
   ignore_errors: true
 
@@ -23,8 +47,8 @@
     - name: debug | print rs
       debug: msg="{{ rs }}"
 
-    - name: check | find pid
-      shell: ps -ef | grep tomcat | grep {{ tomcat_path }} | grep -v grep | awk '{print $2}'
+    - name: check | find app pid
+      shell: ps -ef | grep {{ tomcat_path.stdout }}{{ app }} | grep -v grep | awk '{print $2}'
       register: var_pid
 
     - name: debug | print pid
@@ -34,21 +58,26 @@
       shell: kill -9 {{ var_pid.stdout }}
       when: var_pid.stdout != ''
 
-    - name: stop |  next wait {{ tomcat_port }} stop
-      wait_for: port={{ tomcat_port }} state=stopped timeout=3
+    - name: stop |  next wait {{ appPort }} stop
+      wait_for: port={{ appPort }} state=stopped timeout=3
   when: rs.failed == true
 
-- name: stop |  rm old files
-  shell: "rm -rf {{ tomcat_path }}{{ item }}/*"
+- name: stop | delete cache files
+  shell: "rm -rf {{ tomcat_path.stdout }}{{app}}/{{ item }}/*"
   with_items:
-    - webapps
+    - webapps/WEB-INF
+    - webapps/META-INF
     - work
-    - logs
     - temp
 
-- name: deploy | upload {{ artifact }}
-  copy: src={{ artifact }} dest={{ tomcat_path }}webapps/
+- name: deploy | cp war  to dest dir
+  shell: cp -r /tmp/{{ app }}.war {{ tomcat_path.stdout }}{{ app }}/webapps/ROOT.war
+#
+#- name: jar xvf ROOT.war
+#  shell: jar xvf {{ tomcat_path.stdout }}{{ app }}/webapps/ROOT.war
+#  ignore_errors: true
+#  when: app == "wx"
 
 - name: deploy | start tomcat
-  shell: chdir={{ tomcat_path }}bin nohup ./catalina.sh start &
+  shell: chdir={{ tomcat_path.stdout }}{{ app }}/bin nohup ./catalina.sh start &
   ignore_errors: true
