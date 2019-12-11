@@ -1,0 +1,34 @@
+---
+# author: wei.gao
+
+- name: debug |  print params
+  debug: msg="app = {{ app }}, lang = {{ lang }}, appPort = {{ appPort }}, artifact = {{ artifact }}, env = {{ env }}, group = {{ group }}"
+
+- name: debug |  javaOpts
+  debug: msg="javaOpts = {{ javaOpts }}"
+
+- name: debug |  portArgs
+  debug: msg="portArgs = {{ portArgs }}"
+
+- name: docker pull {{ artifact }}
+  shell: docker pull {{ artifact }}
+
+- name: docker rm -f {{ app }}
+  shell: docker rm -f {{ app }}
+  ignore_errors: true
+
+- block:
+  - name: debug |  run dubbo command
+    debug: msg="docker run -d --restart=always --name {{ app }} -e JAVA_OPTS='{{ javaOpts }}' -e DUBBO_IP_TO_REGISTRY={{ inventory_hostname }} -e DUBBO_PORT_TO_REGISTRY={{ appPort }} {{ portArgs }} {{ artifact }} --apollo.meta={{ apollo_meta }}"
+
+  - name: start
+    shell: docker run -d --restart=always --name {{ app }} -v /mnt:/mnt -e JAVA_OPTS="{{ javaOpts }}" -e DUBBO_IP_TO_REGISTRY={{ inventory_hostname }} -e DUBBO_PORT_TO_REGISTRY={{ appPort }} {{ portArgs }} {{ artifact }} --apollo.meta={{ apollo_meta }}
+  when: group == "dubbo"
+
+- block:
+  - name: debug |  run web command
+    debug: msg="docker run -d --restart=always --name {{ app }} -e JAVA_OPTS='{{ javaOpts }}' {{ portArgs }} {{ artifact }} --apollo.meta={{ apollo_meta }}"
+
+  - name: start
+    shell: docker run -d --restart=always --name {{ app }} -v /mnt:/mnt -e JAVA_OPTS="{{ javaOpts }}" {{ portArgs }} {{ artifact }} --apollo.meta={{ apollo_meta }}
+  when: group != "dubbo"
